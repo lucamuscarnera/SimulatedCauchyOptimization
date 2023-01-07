@@ -3,7 +3,7 @@ Implementation of a stochastic simulation of heat diffusion on an unbounded doma
 
 # Reasons
 
-Let $\mathcal f : \mathbb R \rightarrow \mathbb R$ a non-convex function. Suppose that we are interested in finding $x^\star$ , which is defined as $x^\star := argmax f$.
+Let $\mathcal f : \mathbb R^+ \rightarrow \mathbb R$ a non-convex function. Suppose that we are interested in finding $x^\star$ , which is defined as $x^\star := argmax f$.
 Let's assume that f , not only is non-convex, but is also not differentiable. The proposed algorithms tries to build a framework for global optimization in pathological situations.
 
 # Euristics behind the algorithm
