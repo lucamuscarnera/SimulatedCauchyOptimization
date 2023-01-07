@@ -18,6 +18,9 @@ us to build a framework for a generalization of gradient-based optimization tech
 2.	*Bump smoothing effect* : the heat diffusion tends to smooth thos local extrema which are less desiderable in sense of entity of the value.
 Therefore, applying the fundamentla solution to a loss function should be able to smooth those optima which are of less interest.
 
+![plot](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/Instant%20regularization.png)
+![plot](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/bump%20regularization.png)
+
 From a more euristical point, we know that heat diffusion happens for a exchange of information between a particle and its neighboorhood.
 Moreover, very informally, we can say that the speed of the information is in a certain sense proportional to the entity of information : 
 if we imagine to have a long rod of metal with two sources of heat connected to it in two different points, we have the situation where
