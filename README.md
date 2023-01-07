@@ -34,6 +34,8 @@ More details on mathematical theory will be provided in a separate file.
 
 # Usage of the test
 
+
+![non convex function](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/Non%20Convex%20Function.png)
 At the moment you can try the algorithm using *test1D*.
 In particular, with this application you will be able to maximize an extremely invex function (which can be seen in the png file, with the maximum highlighted)
 You can play with parameters in order to observe different speed / results.
