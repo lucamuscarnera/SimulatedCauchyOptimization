@@ -3,6 +3,9 @@ Implementation of a stochastic simulation of heat diffusion on an unbounded doma
 
 # Euristics behind the algorithm
 
+Let $f : \mathbb R \rightarrow \mathbb R $ a non-convex function. Suppose that we are interested in finding $x^*$ , which is defined as $x^* := argmax f$.
+Let's assume that f , not only is convex, but is also not differentiable. The proposed algorithms tries to build a framework for global optimization in pathological situations.
+
 The main ingredient of the algorithm is the *Fundamental Solution of heat equation*.
 In particular, we would like to analyze the effect of taking a certain loss function as initial condition of a heat-equation based
 cauchy problem. 
