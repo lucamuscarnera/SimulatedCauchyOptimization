@@ -1,13 +1,15 @@
 # SimulatedCauchyOptimization
 Implementation of a stochastic simulation of heat diffusion on an unbounded domain in order to exploit the regularizing effect of fundamental solution of heat equation on a given function, which has to be optimized
 
+# Reasons
+
+Let $\mathcal f : \mathbb R \rightarrow \mathbb R$ a non-convex function. Suppose that we are interested in finding $x^\star$ , which is defined as $x^\star := argmax f$.
+Let's assume that f , not only is non-convex, but is also not differentiable. The proposed algorithms tries to build a framework for global optimization in pathological situations.
+
 # Euristics behind the algorithm
 
-Let $f : \mathbb R \rightarrow \mathbb R $ a non-convex function. Suppose that we are interested in finding $x^*$ , which is defined as $x^* := argmax f$.
-Let's assume that f , not only is convex, but is also not differentiable. The proposed algorithms tries to build a framework for global optimization in pathological situations.
-
 The main ingredient of the algorithm is the *Fundamental Solution of heat equation*.
-In particular, we would like to analyze the effect of taking a certain loss function as initial condition of a heat-equation based
+In particular, we would like to analyze the effect of taking a certain reward function as initial condition of a heat-equation based
 cauchy problem. 
 The main reasons behind this approach are basically 2:
 1.	*Instant regularization* : we know that the fundamental solution acts a regularizing operators, more formally maps functions in 
@@ -21,6 +23,7 @@ Moreover, very informally, we can say that the speed of the information is in a 
 if we imagine to have a long rod of metal with two sources of heat connected to it in two different points, we have the situation where
 if we take a particle which is equidistant from both, that particle will aknowledge first the presence of the heat source which has a greater distance in temperature 
 from its temperature.
+We try to exploit this physical intuition, to build a network of information propagation between points of the domain.
 
 In the algorithm I present , moreover, is inserted a mechanism of penalization of the information relative to minima, in order
 to make the information about "very big maxima" faster than information about "very small minima".
