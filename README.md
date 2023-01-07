@@ -32,6 +32,11 @@ In the algorithm I present , moreover, is inserted a mechanism of penalization o
 to make the information about "very big maxima" faster than information about "very small minima".
 More details on mathematical theory will be provided in a separate file.
 
+![No enhancing of information flow](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/information%20propagation%20standard.png)
+![Enhanced information flow](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/information%20propagation.png)
+
+In the picture you can observe the behavior of the heat diffusion without and with the optimized mechanism of information propagation.
+
 # Usage of the test
 
 
