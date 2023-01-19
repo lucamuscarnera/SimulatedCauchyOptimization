@@ -32,24 +32,5 @@ In the algorithm I present , moreover, is inserted a mechanism of penalization o
 to make the information about "very big maxima" faster than information about "very small minima".
 More details on mathematical theory will be provided in a separate file.
 
-![No enhancing of information flow](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/information%20propagation%20standard.png)
-![Enhanced information flow](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/information%20propagation.png)
-
-In the picture you can observe the behavior of the heat diffusion without and with the optimized mechanism of information propagation.
-
 # Usage of the test
 
-
-![non convex function](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/Non%20Convex%20Function.png)
-At the moment you can try the algorithm using *test1D*.
-In particular, with this application you will be able to maximize an extremely invex function (which can be seen in the png file, with the maximum highlighted)
-You can play with parameters in order to observe different speed / results.
-
-1.	*-x0* : value of the initial guess
-2.	*-n* : number of iterations of gradient ascent.
-3.	*-r* : relaxing parameter. Recalling the physical analogy, is a parameter that quantify the how much time is passed from the instant where heat diffusion starts.
-4.	*-p* : minima penalization. The mechanism will be explained later, but it basically measures the order of increase of speed of information propagation in function of the entity of the maxima.
-5.	*-precision* : precision of the approximation of heat equation solution. The algorithm for heat solution simulation will be explained later, but this parameter basically describe the precision of the result.
-
-Suggested parameters (vary *-x0* to observe stability of the solution ):
-./test1D -x0 -9. -n 100 -r 4. -p 30. -precision 300

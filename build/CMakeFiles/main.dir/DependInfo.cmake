@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/jellyfish/shared-folder/MACSProject2/test1D.cpp" "CMakeFiles/test1D.dir/test1D.cpp.o" "gcc" "CMakeFiles/test1D.dir/test1D.cpp.o.d"
+  "/home/jellyfish/shared-folder/MACSProject2/main.cpp" "CMakeFiles/main.dir/main.cpp.o" "gcc" "CMakeFiles/main.dir/main.cpp.o.d"
   )
 
 # Targets to which this target links.

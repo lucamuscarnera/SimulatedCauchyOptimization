@@ -1,53 +1,49 @@
 /*
 * Diffusion.h
-* Luca Muscarnera ~ 2023
+* Author : Luca Muscarnera
 */
+#include "../Utilities/Utilities.h"
 
-#pragma once
-#include "../Utilities/utilities.h"
-#include <functional>
-#include <random>
-
-std::function<double(double)> relax_grad(std::function<double(double)> f, double t, double p = 0., int n = 1000)
+template<Vectorial T> 
+class relax 
 {
+public:
+std::vector<T> sampling ;
 
-    std::function<double(double)> ret = [=](double x)
-    {
-        std::default_random_engine generator;
-        std::normal_distribution<double> distribution(0., t*t);
+// functor
+std::function<double(T &)> 
+operator () (
+			std::function<double(T)> f,
+			T zero,							// origine dello spazio
+			double time,
+			double propagation = 0.,
+			std::function<double(double)> 
+				weightFunction = [](  double y ) {return 1.; } 
+		 )
+{
+		std::clog << "test";
+		sampling = zero.neighborhood(1000, time); 		// campionamento
+		
+		std::function<double(T &)> ret = [=](T & x) {
+			std::clog << "test";
+			
+			auto Y = scatterAndShift(x , sampling);				// estraggo i vicini
 
-        std::vector<double> X(n);
-        for (int i = 0; i < X.size(); i++)
-        {
-            double noise = distribution(generator);
-            double number = x + noise;
-            X[i] = number;
-        }
-		
-		
-		
-		// definition of the weights
-		std::vector<double> Weights(n);		
-		std::vector<double> Y = map(f, X);
-		double maxY           = max(Y);
-		
-		for (int i = 0; i < X.size(); i++)
-        {	
-			Weights[i] = exp(- p * log( maxY ))  + 
-						 exp(  p * log(f(X[i]) / maxY ) );
-		}
-		
-		
-		
-		// computation of the approximated derivative
-        std::vector<double> A,B,C;
-		Y = pairwiseprod( Y , Weights);	    // f(X) * weights
+		std::clog << "test3";
+			auto fY = map(f,Y);									// calcolo il valore della funzione nei vicini
+			auto  w = map<double>(weightFunction , fY);			// associo ad ogni valore un peso
 
-        A = pairwiseprod( Y,  X); 			// f(X) * weights * X		
-		B = product( x, Y );				// x * f(X) * weights
-		C = sub(A,B);						// f(X) * weights * X	 - x * f(X) * weights
-		
-        return mean(C) / mean(Weights);
-    };
-    return ret;
+			double num = 0.;	
+			double den = 0;
+			
+			for(int i = 0; i < fY.size();i++)					// calcolo la media campionaria
+			{
+				num = (i * num + fY[i] * w[i]  )/(i + 1.);	
+				den = (i * den + w[i])/(i + 1.);
+			}
+			
+			return num/den;											// ritorno la media campionaria
+		};
+		return ret;
 }
+};

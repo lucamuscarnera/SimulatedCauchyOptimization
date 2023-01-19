@@ -1,4 +1,4 @@
-# Install script for directory: /home/jellyfish/shared-folder/MACSProject
+# Install script for directory: /home/jellyfish/shared-folder/MACSProject2
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/jellyfish/shared-folder/MACSProject/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/jellyfish/shared-folder/MACSProject2/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

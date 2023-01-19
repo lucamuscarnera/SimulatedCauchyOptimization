@@ -57,10 +57,10 @@ RM = /u/sw/toolchains/gcc-glibc/11.2.0/base/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/jellyfish/shared-folder/MACSProject
+CMAKE_SOURCE_DIR = /home/jellyfish/shared-folder/MACSProject2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/jellyfish/shared-folder/MACSProject/build
+CMAKE_BINARY_DIR = /home/jellyfish/shared-folder/MACSProject2/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jellyfish/shared-folder/MACSProject/build/CMakeFiles /home/jellyfish/shared-folder/MACSProject/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jellyfish/shared-folder/MACSProject2/build/CMakeFiles /home/jellyfish/shared-folder/MACSProject2/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jellyfish/shared-folder/MACSProject/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jellyfish/shared-folder/MACSProject2/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test1D
+# Target rules for targets named main
 
 # Build rule for target.
-test1D: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test1D
-.PHONY : test1D
+main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 main
+.PHONY : main
 
 # fast build rule for target.
-test1D/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1D.dir/build.make CMakeFiles/test1D.dir/build
-.PHONY : test1D/fast
+main/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+.PHONY : main/fast
 
-test1D.o: test1D.cpp.o
-.PHONY : test1D.o
+main.o: main.cpp.o
+.PHONY : main.o
 
 # target to build an object file
-test1D.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1D.dir/build.make CMakeFiles/test1D.dir/test1D.cpp.o
-.PHONY : test1D.cpp.o
+main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.o
+.PHONY : main.cpp.o
 
-test1D.i: test1D.cpp.i
-.PHONY : test1D.i
+main.i: main.cpp.i
+.PHONY : main.i
 
 # target to preprocess a source file
-test1D.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1D.dir/build.make CMakeFiles/test1D.dir/test1D.cpp.i
-.PHONY : test1D.cpp.i
+main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.i
+.PHONY : main.cpp.i
 
-test1D.s: test1D.cpp.s
-.PHONY : test1D.s
+main.s: main.cpp.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-test1D.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1D.dir/build.make CMakeFiles/test1D.dir/test1D.cpp.s
-.PHONY : test1D.cpp.s
+main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... test1D"
-	@echo "... test1D.o"
-	@echo "... test1D.i"
-	@echo "... test1D.s"
+	@echo "... main"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 
