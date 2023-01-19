@@ -1,3 +1,0 @@
-/home/jellyfish/shared-folder/MACSProject2/build/CMakeFiles/rebuild_cache.dir
-/home/jellyfish/shared-folder/MACSProject2/build/CMakeFiles/edit_cache.dir
-/home/jellyfish/shared-folder/MACSProject2/build/CMakeFiles/main.dir
