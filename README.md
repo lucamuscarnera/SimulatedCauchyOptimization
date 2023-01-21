@@ -32,6 +32,8 @@ In the algorithm I present , moreover, is inserted a mechanism of penalization o
 to make the information about "very big maxima" faster than information about "very small minima".
 More details on mathematical theory will be provided in a separate file.
 
+![plot](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/Algorithm%20improving.gif)
+
 # Compilation of the library
 
 ```console
