@@ -34,6 +34,13 @@ More details on mathematical theory will be provided in a separate file.
 
 ![plot](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/Algorithm%20improving.gif)
 
+# Extension of the notion of heat diffusion to non-euclidean spaces
+
+With a theoretical approach to the problem it was possible to extend the result also to discrete objects. In particular, the focus was mainly on the Permutation Lattice due to its deep implications in optimization theory.
+Here we can see a comparision between the Classic Greedy algorithm VS Simulated Cauchy Greedy algorithm for Travelling salesman optimization, a very popular optimization problem where we search , in the space of all the possible permutation on a given set, the route that minimizes the length to touch all the elements in the set (it's convenient to use a permutation to represent the route , since we have necessarly to touch all elements so basically)
+
+![TravellingSalesman](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/travel.gif)
+
 # Compilation of the library
 
 ```console
