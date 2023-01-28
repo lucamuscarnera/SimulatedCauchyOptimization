@@ -25,3 +25,4 @@ template <Vectorial T>
 class Optimizer;
 
 #include "VectorialClasses/Real.h"
+#include "VectorialClasses/Permutation.h"

@@ -15,49 +15,130 @@
 */
 #pragma once
 
+template <Vectorial T>
+class Optimizer;
+
 #include "../../../Serial/Vectorial/VectorialModule.h"
 #include "../../../Serial/Optimizer/OptimizerStatus/OptimizerStatus.h"
+
+#include <map>
+#include <omp.h>
 
 template <Vectorial T>
 class Optimizer{
 	public:
+	
+/***Context********************************************************************************************************************/
+
 /***Status********************************************************************************************************************/
-OptimizerStatus<T> status;
+	OptimizerStatus<T> status;													// contiene le informazioni sullo stato della procedura 
+																				// l'ingrediente principale é il metodo "screenshot" che prende in ingresso
+																				// il contesto di ottimizzazione e lo salva in un vettore
 /*****************************************************************************************************************************/
 	
-	Optimizer(T & x, std::function<double(T)> f, double time, int precision = 1000) : x(x) , f(f), time(time) {
-		x.buildCanonicalNeighbourhood(precision);		// costruisco il vicinato canonico
-		x.optimizationContext = this;					// imposto il contesto di ottimizzazione
+	Optimizer(T & x, 
+			  std::function<double(T)> f, 
+			  double time, 
+			  int precision = 1000
+			  )
+	: x(x) , 
+	  f(f) , 
+	  time(time), 
+	  precision(precision)
+	{
+		x.buildCanonicalNeighbourhood(precision,time);  						// costruisco il vicinato canonico
+		x.optimizationContext = this;											// imposto il contesto di ottimizzazione
 	};
 
-/*****************************************************************************************************************************/	
+/***Getters & Setters*********************************************************************************************************/	
 	
-	double relaxedEvaluation(T & x) {					// la relazed evaluation é invariante per spazio di ottimizzazione
-		auto Y  = x.neighbourhood(time);
-		auto fY = Y.apply(f);
-		double ret = 0.;
-		double weightMean = 0.;
-		
-		for(int i = 0 ; i < fY.size();i++)
+	// time
+	void setTime(double time) {
+		this->time = time;
+		x.buildCanonicalNeighbourhood(precision,time); 
+	}
+	
+	double getTime()
+	{
+		return time;
+	}
+	
+	// function
+	
+	std::function<double(T)> getFunction() {
+		return f;
+	}
+	
+	void setFunction(std::function<double(T)> f) {
+		this->f = f;
+		this->observedF = f;
+	}
+	
+	// precision
+	
+	int getPrecision() {
+		return precision;
+	}
+	
+	void setPrecision(int precision)
+	{
+		this->precision = precision;
+	}
+	
+	// variable
+	
+	T & getVariable() {
+		return x;
+	}
+	
+	
+	// callbacks
+	
+	void addCallback(std::function<void(Optimizer<T> *)> f) {
+		callbacksList.push_back(f);
+	}
+	
+/*****************************************************************************************************************************/
+
+	double relaxedEvaluation(T & x ) {											// la relazed evaluation é invariante per spazio di ottimizzazione
+	
+		auto fY = x.neighbourhood().apply(getFunction());						// calcolo il valore della funzione per ogni punto del vicinato	
+
+		double ret = 0.;														// inizializzo il valore di ritorno a 0 
+		double weightMean = 0.;													// inizializzo il valore della media dei pesi a 0
+
+		#pragma omp parallel for num_threads(8) reduction(+:ret) reduction(+:weightMean)
+		for(int i = 0 ; i < fY.size();i++)										// per ogni valore nell'insieme delle valutazioni del vicinato
 		{
-			double w = 1 + fY[i]*fY[i];
-			weightMean = ( i * weightMean + w ) / ( i + 1 );
-			ret = (i * ret + fY[i] * w ) / (i + 1);
+			double w = 1. / (0.1 + fY[i]*fY[i]);								//	calcolo il peso per il punto del vicinato corrente
+
+			weightMean = ( i * weightMean + w ) / ( i + 1 );					// 	aggiorno la media dei pesi
+			ret = (i * ret + fY[i] * w ) / (i + 1);								// 	aggiorno la somma pesata
 		}
-		return ret * ( 1. / weightMean );
+		
+
+		return ret * ( 1. / weightMean );										// ritorno la media pesata 
 	} 
 
 /*****************************************************************************************************************************/
 
 	void operator() (int iter) {
-		T mom = x * 0;
-		for(int i = 0 ; i < iter; i ++ )
+		T mom = T::zero(x);														// carico l'elemento neutro dallo spazio a cui appartiene l'ottimizzando
+		for(int i = 0 ; i < iter; i ++ )			
 		{
-			mom =  mom * 0.9;
-			T increment = x.generalizedGradient(f,time) * 0.1;
-			mom += increment;
-			x += mom;
-			x.show();
+			mom *= 0.9;																		// gestisco il momentum
+			T increment = getVariable().generalizedGradient(getFunction()) * 0.01;			// calcolo la direzione privilegiata
+			//mom += increment;			// } not for permutation
+			//x += mom;					// }
+			
+			//x += increment;			// } for permutation												// traslo l'ottimizzando lungo la direzione privilegiata
+			//x.show();
+			T::improve(x, increment, mom);
+			//x.show();
+			for( auto c : callbacksList )										// chiamo ogni callback dando in ingresso il contesto corrente
+				c(this);
+			//std::clog << "T=" << time << ":"<< f(x) << std::endl;				// simply debug
+			//std::clog << relaxedEvaluation(x) << std::endl;
 			//std::clog << relaxedEvaluation(x) << std::endl;
 			//printf("\t\t%f\t\t%f\n",relaxedEvaluation(x), f(x));
 		}
@@ -67,6 +148,15 @@ OptimizerStatus<T> status;
 /*****************************************************************************************************************************/
 
 	T & x;	
-	std::function<double(T)> f;
+	public:
+	std::function<double(T)> f;											// funzione data in input al costruttore
+	std::function<double(T)> observedF;									// funzione osservata dalla procedura di ottimizzazione
 	double time;
+	int precision;
+	
+	std::vector<std::function< void(Optimizer<T> * )>> callbacksList;
+/*****************************************************************************************************************************/
+	
+	
+
 };

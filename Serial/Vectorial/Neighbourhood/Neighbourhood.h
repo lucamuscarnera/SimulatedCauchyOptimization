@@ -8,6 +8,7 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include <omp.h>
 
 template<class T>
 class Neighbourhood {
@@ -15,22 +16,29 @@ class Neighbourhood {
 		Neighbourhood() {};
 		Neighbourhood(std::vector<T> input) : data(input) {};
 		std::vector<T> data;
+		
+		void flush() {
+			data.clear();
+		}
+		
 		void push_back(T input){
 			data.push_back(input);
 		}
 		int size() {
 			return data.size();
 		}
-		T operator[] (int i)
+		T & operator[] (int i)
 		{
 			return data[i];
 		}
 		
 		std::vector<double> apply(std::function<double(T)> f) {
+			//std::clog << "apply" << std::endl;
 			std::vector<double> y(size());
 			for(int i = 0 ; i < size();i++) {
 				y[i] = f(data[i]);
 			}
+			
 			return y;
 		}
 };

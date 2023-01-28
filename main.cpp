@@ -7,6 +7,11 @@
 #include <iostream>
 #include "Serial/Vectorial/VectorialModule.h"
 #include "Serial/Optimizer/OptimizerModule.h"
+#include "Serial/Visualization/Cpp/Visualization.h"
+
+
+#include <string>
+#include <fstream>
 
 double f(std::vector<double> x) {
 	double nucleo_1 = 0;
@@ -14,27 +19,23 @@ double f(std::vector<double> x) {
 	for(int i = 0 ; i < x.size();i++)
 	{
 		nucleo_1 += x[i] * x[i];
-		nucleo_2 += ( x[i] - 3.) * ( x[i] - 3.) ;
+		nucleo_2 += ( x[i] - i - 1. ) * ( x[i] - i - 1.) ;
 	}
-	return exp( - nucleo_1) + 3 * exp( - 10 * nucleo_2) + 2 * sin(nucleo_1) * sin(nucleo_1);
+	return exp( - nucleo_1) + 5 * exp( - 3 * nucleo_2) + 2 * sin(10 * nucleo_1) * sin(10 * nucleo_1);
 }
 
-double g(double x)
-{
-	return sin(x) * sin(x) + 3 * exp( - x*x );
-}
 
 int main() {
-	//Vector x(std::vector<double>{-5.,-2.});
-	//Optimizer<Vector> O(x, f, 10., 10000);
-	//O(10000);
+	std::clog << "Valore iniziale x : " <<std::endl;
+	Vector x(std::vector<double> {-4.,-4.} );
+	x.show();
+	std::clog << "Ottimizziamo la funzione f che ha minimo globale in (1,2)" << std::endl;
+	double T = 4.0;
 	
-	Real x(-5.);
-	Optimizer<Real> O(x,g,2.,1000);
+	Optimizer<Vector> O( x,
+							 f,
+							 T,
+							 1000);
 	O(1000);
-	
-	//x.show();
-	//Real y(5.4);
-	//y.show();
-	//std::cout << "Test!"  << f(x) << std::endl;	
+	x.show();
 }
