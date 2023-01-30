@@ -49,3 +49,24 @@ cd build
 cmake ..
 make
 ```
+
+
+# Running test 1
+
+Tests the travelling salesman on the verteces of a convex polygon, which represents one of the few cases where the solution is known.
+Running the optimization with an ad hoc schedule, we are able to converge to the global optimum.
+(it is interesting if you think the probability by choosing randomly would be $O(\frac{1}{n!})$
+
+After running ```make``` it is sufficient to perform two steps
+
+1) running the test
+```
+cd build
+./test1
+```
+2) Produce the visualization
+```
+python ../Visualizer/Test1/Test1.py
+```
+
+Then, you will find the animation ```travel.gif``` in the folder ```Visualizer/Test1```
