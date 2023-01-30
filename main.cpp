@@ -36,6 +36,9 @@ int main() {
 							 f,
 							 T,
 							 1000);
+	O.addCallback(callbacks::writeCallback("vectorOpt.csv"));
+	O.addCallback(callbacks::bestResultCallback<Vector>("miglior vettore.csv"));
 	O(1000);
+	O.status.write();
 	x.show();
 }

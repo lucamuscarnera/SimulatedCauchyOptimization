@@ -43,6 +43,7 @@ class Optimizer{
 			  )
 	: x(x) , 
 	  f(f) , 
+	  observedF(f),
 	  time(time), 
 	  precision(precision)
 	{
@@ -66,12 +67,12 @@ class Optimizer{
 	// function
 	
 	std::function<double(T)> getFunction() {
-		return f;
+		return observedF;
 	}
 	
 	void setFunction(std::function<double(T)> f) {
 		this->f = f;
-		this->observedF = f;
+		this->observedF = this->f;
 	}
 	
 	// precision
@@ -93,21 +94,35 @@ class Optimizer{
 	
 	
 	// callbacks
-	
-	void addCallback(std::function<void(Optimizer<T> *)> f) {
-		callbacksList.push_back(f);
+	template <class U>
+	void addCallback(U f) {
+		constexpr bool has_initialization = requires(U t, Optimizer<T> * c ) {		// controllo in compile time che esista un metodo init
+			{ t.init(c) } -> void; 					
+		};
+		std::clog << "aggiunta callback..." << std::endl;
+		if constexpr( has_initialization ) {										// se l'oggetto f lo ha la chiamo, altrimento semplicemente ignoro la cosa
+			std::cout << "inzializzo la callback..." << std::endl;					// faccio cosí in modo da garantire flessibilita
+			f.init(this);															// sul tipo di callback da costruire, in modo da non avere la necessiitá
+		} else {
+			std::cout << "niente da inizializzare!" << std::endl;
+		}																			// esplicita che un oggetto abbia un metodo init vuoto	
+																					// inoltre essendo a compile time , non "pago" la cosa! 
+																					
+		callbacksList.push_back(f);													// dopo questa procedura , inseriso l'oggetto	
+																					// nella collezione di callbacks, castandolo come funtore
 	}
+	
+
 	
 /*****************************************************************************************************************************/
 
-	double relaxedEvaluation(T & x ) {											// la relazed evaluation é invariante per spazio di ottimizzazione
+	double relaxedEvaluation(T & x ) {											// la relaxed evaluation é invariante per spazio di ottimizzazione
 	
 		auto fY = x.neighbourhood().apply(getFunction());						// calcolo il valore della funzione per ogni punto del vicinato	
 
 		double ret = 0.;														// inizializzo il valore di ritorno a 0 
 		double weightMean = 0.;													// inizializzo il valore della media dei pesi a 0
-
-		#pragma omp parallel for num_threads(8) reduction(+:ret) reduction(+:weightMean)
+		
 		for(int i = 0 ; i < fY.size();i++)										// per ogni valore nell'insieme delle valutazioni del vicinato
 		{
 			double w = 1. / (0.1 + fY[i]*fY[i]);								//	calcolo il peso per il punto del vicinato corrente
@@ -124,6 +139,7 @@ class Optimizer{
 
 	void operator() (int iter) {
 		T mom = T::zero(x);														// carico l'elemento neutro dallo spazio a cui appartiene l'ottimizzando
+		
 		for(int i = 0 ; i < iter; i ++ )			
 		{
 			mom *= 0.9;																		// gestisco il momentum
@@ -135,8 +151,8 @@ class Optimizer{
 			//x.show();
 			T::improve(x, increment, mom);
 			//x.show();
-			for( auto c : callbacksList )										// chiamo ogni callback dando in ingresso il contesto corrente
-				c(this);
+			for( auto & c : callbacksList )										// chiamo ogni callback dando in ingresso il contesto corrente
+				(c)(this);
 			//std::clog << "T=" << time << ":"<< f(x) << std::endl;				// simply debug
 			//std::clog << relaxedEvaluation(x) << std::endl;
 			//std::clog << relaxedEvaluation(x) << std::endl;
@@ -154,7 +170,7 @@ class Optimizer{
 	double time;
 	int precision;
 	
-	std::vector<std::function< void(Optimizer<T> * )>> callbacksList;
+	std::vector<std::function< void(Optimizer<T> * )>  > callbacksList;
 /*****************************************************************************************************************************/
 	
 	

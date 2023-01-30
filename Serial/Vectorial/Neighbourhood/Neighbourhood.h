@@ -31,10 +31,10 @@ class Neighbourhood {
 		{
 			return data[i];
 		}
-		
 		std::vector<double> apply(std::function<double(T)> f) {
 			//std::clog << "apply" << std::endl;
 			std::vector<double> y(size());
+			#pragma omp parallel for num_threads(8)
 			for(int i = 0 ; i < size();i++) {
 				y[i] = f(data[i]);
 			}

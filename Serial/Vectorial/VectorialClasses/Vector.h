@@ -180,6 +180,12 @@ static void improve(Vector & x , Vector & increment, Vector & mom) {
 			x += mom;					
 }
 
+/*** flatten ***/
+
+std::vector<double> flatten() {
+	return data;
+}
+
 };
 
 Neighbourhood<Vector> Vector::canonicalNeighbourhood;

@@ -294,16 +294,17 @@ class Permutation {
 
 	Optimizer<Permutation> * optimizationContext;												 // contesto di ottimizzazione
 	
-/***Rappresentazione vettoriale **********************************************************************************************/
-	
-	const std::vector<int> & flatten() {
-		return data.cgetLower();
-	}
-	
+
 /***Procedura di ottimizzazione***/
-static void improve(Permutation & x , Permutation & increment, Permutation & mom) {
-			x += increment;						
-}
+	static void improve(Permutation & x , Permutation & increment, Permutation & mom) {
+				x += increment;						
+	}
+
+/*** flatten ***/
+	const std::vector<int> & flatten() {
+			return data.cgetLower();
+	}
+
 
 };
 //std::map<Permutation , double > Permutation::memory;
