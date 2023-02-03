@@ -15,8 +15,7 @@ void Real::buildCanonicalNeighbourhood (int n,double t) {					// assemblaggio de
 
 Neighbourhood<Real> Real::neighbourhood() const {									// ottenimento del vicinato	
 			int n = canonicalNeighbourhood.size();
-			std::vector<Real> ret(n);
-			#pragma omp parallel for num_threads(optimizationContext->getThreads() ) 
+			std::vector<Real> ret(n); 
 			for(int i = 0; i < n;i++)
 			{
 				double value = data + canonicalNeighbourhood[i];
