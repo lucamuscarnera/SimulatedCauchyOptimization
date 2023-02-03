@@ -44,12 +44,11 @@ Here we can see a comparision between the Classic Greedy algorithm VS Simulated 
 # Compilation of the library
 
 ```console
-mkdir build
-cd build
-cmake ..
 make
 ```
 
+
+REMARK: In every test, it is possible to (select the number of threads in parallel by simply putting it after the program name)
 
 # Running test 1
 
@@ -62,11 +61,39 @@ After running ```make``` it is sufficient to perform two steps
 1) running the test
 ```
 cd build
-./test1
+./test1 <n_threads>
 ```
 2) Produce the visualization
 ```
 python ../Visualizer/Test1/Test1.py
 ```
+
+# Running real test
+
+Optimizes a simple non convex function.
+Keep in mind that the visualization procedure is very heavy, therefore is not a test intended to be an evaluation of the performance.
+If it is desired to evaluate purely the performance with real number optimization, is necessary to remove the callbacks used to implement the graphics (see later for an explanation about callbacks)
+
+1) running the test
+```
+cd build
+./real_test <n_threads>
+```
+
+2) Produce the visualization
+```
+python ../Visualizer/RealTest/RealTest.py
+```
+
+The visualization will show the so called "perceived function" : what does the variable see at a certain time? It shows the relaxing through the procedure.
+
+# Running Vector test
+
+On the opposite we have a test without visualization. A non convex function similar to the one of the real test is optimized in five dimensions.
+
+
+
+
+
 
 Then, you will find the animation ```travel.gif``` in the folder ```Visualizer/Test1```
