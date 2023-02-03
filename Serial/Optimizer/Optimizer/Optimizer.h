@@ -166,7 +166,7 @@ class Optimizer   {
 		
 
 		
-		#pragma omp parallel for reduction(+:weightMean) reduction(+:ret) num_threads(16)	// non cambia assolutamente nulla
+		#pragma omp parallel for reduction(+:weightMean) reduction(+:ret) num_threads(16)	
 		for(int i = 0 ; i < fY.size();i++)										// per ogni valore nell'insieme delle valutazioni del vicinato
 		{
 			double w = enhancingFunction(fY[i]);								//	calcolo il peso per il punto del vicinato corrente
