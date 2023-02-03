@@ -14,44 +14,64 @@
 *	dallo spazio in cui ci troviamo )
 */
 #pragma once
-
-template <Vectorial T>
-class Optimizer;
-
-#include "../../../Serial/Vectorial/VectorialModule.h"
 #include "../../../Serial/Optimizer/OptimizerStatus/OptimizerStatus.h"
+#include "../../../Serial/Vectorial/Vectorial/Vectorial.h"
 
+#include <random>
+#include <iomanip>
 #include <map>
 #include <omp.h>
 
-template <Vectorial T>
-class Optimizer{
+
+template <class T>
+class Optimizer   {
 	public:
 	
 /***Context********************************************************************************************************************/
 
 /***Status********************************************************************************************************************/
-	OptimizerStatus<T> status;													// contiene le informazioni sullo stato della procedura 
-																				// l'ingrediente principale é il metodo "screenshot" che prende in ingresso
-																				// il contesto di ottimizzazione e lo salva in un vettore
-/*****************************************************************************************************************************/
 	
+	private:    OptimizerStatus<T> status;													// contiene le informazioni sullo stato della procedura 
+																							// l'ingrediente principale é il metodo "screenshot" che prende in ingresso
+																							// il contesto di ottimizzazione e lo salva in un vettore
+	public:		OptimizerStatus<T> & getStatus() {
+		return status;
+	}
+	
+/*****************************************************************************************************************************/
+	public:	
 	Optimizer(T & x, 
 			  std::function<double(T)> f, 
 			  double time, 
-			  int precision = 1000
+			  int precision = 1000,
+			  std::function<double(double)> enhancingFunction = T::defaultEnhancingFunction
 			  )
 	: x(x) , 
 	  f(f) , 
 	  observedF(f),
 	  time(time), 
-	  precision(precision)
+	  precision(precision),
+	  threads(16)
+	  
 	{
+		
+		// controllo che il template sia affine al concetto di vectorial
+		constexpr bool isVectorial = Vectorial<T>;
+		static_assert(isVectorial , "Lo spazio che ospita la struttura dati che stai cercando di ottimizzare non ha tutti gli elementi necessari per la procedura di ottimizzazione.");
+		
 		x.buildCanonicalNeighbourhood(precision,time);  						// costruisco il vicinato canonico
 		x.optimizationContext = this;											// imposto il contesto di ottimizzazione
+		this->enhancingFunction = enhancingFunction;
 	};
 
 /***Getters & Setters*********************************************************************************************************/	
+	// threads
+	
+	int getThreads() {return threads;};
+	void setThreads(int n) {
+		std::cout << "Ottimizzatore lanciato con " << n << " threads!" << std::endl;
+		threads = n;
+		};
 	
 	// time
 	void setTime(double time) {
@@ -75,6 +95,16 @@ class Optimizer{
 		this->observedF = this->f;
 	}
 	
+	// enhancingFunction	/* descrive l'accelerazione di propagazione di informazione */ 
+
+	std::function<double(T)> getEnhancingFunction() {
+		return enhancingFunction;
+	}
+	
+	void setEnhancingFunction(std::function<double(T)> f) {
+		enhancingFunction = f;		
+	}	
+	
 	// precision
 	
 	int getPrecision() {
@@ -94,6 +124,8 @@ class Optimizer{
 	
 	
 	// callbacks
+	public:
+	
 	template <class U>
 	void addCallback(U f) {
 		constexpr bool has_initialization = requires(U t, Optimizer<T> * c ) {		// controllo in compile time che esista un metodo init
@@ -115,21 +147,34 @@ class Optimizer{
 
 	
 /*****************************************************************************************************************************/
-
-	double relaxedEvaluation(T & x ) {											// la relaxed evaluation é invariante per spazio di ottimizzazione
+	public:
+	double relaxedEvaluation(const T & x) {										// la relaxed evaluation é invariante per spazio di ottimizzazione
 	
 		auto fY = x.neighbourhood().apply(getFunction());						// calcolo il valore della funzione per ogni punto del vicinato	
 
 		double ret = 0.;														// inizializzo il valore di ritorno a 0 
 		double weightMean = 0.;													// inizializzo il valore della media dei pesi a 0
 		
+		/*
 		for(int i = 0 ; i < fY.size();i++)										// per ogni valore nell'insieme delle valutazioni del vicinato
 		{
 			double w = 1. / (0.1 + fY[i]*fY[i]);								//	calcolo il peso per il punto del vicinato corrente
 
-			weightMean = ( i * weightMean + w ) / ( i + 1 );					// 	aggiorno la media dei pesi
-			ret = (i * ret + fY[i] * w ) / (i + 1);								// 	aggiorno la somma pesata
+			weightMean = ( i * weightMean + w ) / ( i + 1. );					// 	aggiorno la media dei pesi
+			ret = (i * ret + fY[i] * w ) / (i + 1.);							// 	aggiorno la somma pesata
+		}*/
+		
+
+		
+		#pragma omp parallel for reduction(+:weightMean) reduction(+:ret) num_threads(16)	// non cambia assolutamente nulla
+		for(int i = 0 ; i < fY.size();i++)										// per ogni valore nell'insieme delle valutazioni del vicinato
+		{
+			double w = enhancingFunction(fY[i]);								//	calcolo il peso per il punto del vicinato corrente
+
+			weightMean += w;					// 	aggiorno la media dei pesi
+			ret 	   += fY[i] * w; 			// 	aggiorno la somma pesata
 		}
+		
 		
 
 		return ret * ( 1. / weightMean );										// ritorno la media pesata 
@@ -143,30 +188,28 @@ class Optimizer{
 		for(int i = 0 ; i < iter; i ++ )			
 		{
 			mom *= 0.9;																		// gestisco il momentum
-			T increment = getVariable().generalizedGradient(getFunction()) * 0.01;			// calcolo la direzione privilegiata
-			//mom += increment;			// } not for permutation
-			//x += mom;					// }
-			
-			//x += increment;			// } for permutation												// traslo l'ottimizzando lungo la direzione privilegiata
-			//x.show();
+			T increment = getVariable().generalizedGradient(getFunction());			    	// calcolo la direzione privilegiata
+
+
 			T::improve(x, increment, mom);
-			//x.show();
+			
+			
 			for( auto & c : callbacksList )										// chiamo ogni callback dando in ingresso il contesto corrente
 				(c)(this);
-			//std::clog << "T=" << time << ":"<< f(x) << std::endl;				// simply debug
-			//std::clog << relaxedEvaluation(x) << std::endl;
-			//std::clog << relaxedEvaluation(x) << std::endl;
-			//printf("\t\t%f\t\t%f\n",relaxedEvaluation(x), f(x));
 		}
 	}
 	
 
 /*****************************************************************************************************************************/
-
+	private:
+	
+	
+	int threads;
 	T & x;	
 	public:
 	std::function<double(T)> f;											// funzione data in input al costruttore
 	std::function<double(T)> observedF;									// funzione osservata dalla procedura di ottimizzazione
+	std::function<double(double)> enhancingFunction;							// funzione di enhancing della propagazione dell'informazione
 	double time;
 	int precision;
 	

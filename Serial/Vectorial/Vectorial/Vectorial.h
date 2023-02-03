@@ -11,17 +11,28 @@
 *	dell'oggetto come matrice ( ad esempio il metodo Matrix::get(int row,int col) che ritorna un elemento alla riga row e alla colonna col.
 *	Il concetto Vectorial contiene anche i double, in modo da inglobare anche l'insieme R nei possibili spazi vettoriali.
 */
-#pragma once
+
+#ifndef VECTORIAL_H
+#define VECTORIAL_H
+
+#include <functional>
+#include "../Neighbourhood/Neighbourhood.h"
+
+template<typename NumericType>
+concept Numeric = std::is_arithmetic<NumericType>::value ;
 
 template <typename T>	
-concept Vectorial = requires(T a, T b) {		// costruisco la sotto-collezione di tutte le classi che soddisfa il requirement
-	//a += b;														/* possesso di operazione di somma    */
-	//a * c;														/* possesso di operazione per scalare */
-	  
-	//{ a.buildCanonicalNeighbourhood(precision) } -> void;		/* deve esistere una funzione per la costruzione del vicinato canonico */
-	//{ a.neighbourhood() } -> void;								/* deve esistere una funzione per la costruzione del vicinato canonico */
-	//{ a.generalizedGradient() } -> T;							/* deve esistere un metodo per ottenere il vettore che descrive la 
-	//															*  direzione privilegiata per la massimizzazione della funzione di costo
-	//			*/
+concept Vectorial = requires(T a, T b, std::function<double(T)> f,int precision, int t_int , double t_double) {		// costruisco la sotto-collezione di tutte le classi che soddisfa il requirement
+	//a += b;																/* possesso di operazione di somma    */
+	//a * c;																/* possesso di operazione per scalare */
+
+	{ a.buildCanonicalNeighbourhood(precision, t_int) } -> void;
+	{ a.buildCanonicalNeighbourhood(precision, t_double) } -> void ;		/* deve esistere una funzione per la costruzione del vicinato canonico		*/
+	{ a.neighbourhood() } -> Neighbourhood<T>;								/* deve esistere una funzione per la costruzione del vicinato canonico 		*/
+	{ a.generalizedGradient(f) } -> T;										/* deve esistere un metodo per ottenere il vettore che descrive la  		*/
+																			/*  direzione privilegiata per la massimizzazione della funzione di costo	*/
+
 	a += b;
 };
+
+#endif

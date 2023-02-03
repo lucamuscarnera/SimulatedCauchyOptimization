@@ -7,185 +7,103 @@
 *			Contiene inoltre la classe Real, che costruisce un wrapper per la gestione dei double.
 */
 
-#pragma once
 #include <iostream>
 #include <vector>
 #include <random>
 #include <iomanip>
 
-#include "../../../Serial/Optimizer/OptimizerModule.h"
+#include "../../Optimizer/Optimizer/Optimizer.h"
 
+#ifndef VECTOR_H
+#define VECTOR_H
 
 class Vector {
 	public:
 	
 /***Zero**********************************************************************************************************************/
 	
-	static Vector zero(Vector & x)  {
+	static Vector zero(Vector & x)  {										// Zero dello spazio
 		return Vector(x.size());
 	};
 	
 /***Costruttori***************************************************************************************************************/
 	
-	Vector() : data() {};
-	Vector(int i) : data(i) {};
-	Vector(std::vector<double> input) : data(input) {};
+	Vector() : data() {};													// costruttore base
+	Vector(int i) : data(i) {};												// costruttore di zeri a i dimensioni
+	Vector(std::vector<double> input) : data(input) {};						// costruttore a partire dall'informazione grezza
 	
 /***Storage*******************************************************************************************************************/
-
-	std::vector<double> data;
+	private:
 	
-/***Gestione neighbourhoods**************************************************************************************************/
-
-	static Neighbourhood<Vector> canonicalNeighbourhood;					// vicinato canonico
+	std::vector<double> data;												// container dell'informazione grezza
 	
-	void buildCanonicalNeighbourhood (int n, double t) {					// assemblaggio del vicinato canonico
+	public:
 	
-			// svuoto il vicinato canonico nel caso fosse stato precedentemente inzializzato
-			canonicalNeighbourhood.flush();	
-			
-			// inizializzo la distribuzione normale standard per il campionamento
-			std::default_random_engine generator;
-			std::normal_distribution<double> distribution(0.0,1.0);
-			
-			for(int i = 0; i < n;i++)
-			{
-				// inizializzo il vettore da inserire nel canonicalNeighbourhood
-				std::vector<double> row(size());
-				
-				// per ogni componente del vettore...
-				for(int j = 0 ; j < size();j++) {
-					// ...campiono un elemento...
-					row[j] = distribution(generator) * sqrt(t);		// remark : N(0,1) * sqrt(T) = N(0,T)
-				}
-			
-				// ... e lo aggiungo al vicinato
-				canonicalNeighbourhood.push_back((row));
-			}
-			
-	}
-	
-	Neighbourhood<Vector> neighbourhood() {				
-			// carico il numero di elementi nel canonicalNeighbourhood
-			int n = canonicalNeighbourhood.size();
-			
-			// carico un vettore di Vectors 
-			std::vector<Vector> ret(n);
-			
-			// per ogni elemento nel canonicalNeighbourhood
-			for(int i = 0; i < n;i++)
-			{
-				// ...inizializzo un vettore...
-				std::vector<double> row(size());
-				for(int j = 0 ; j < size();j++) {
-					// inserisco alla j-esima posizione la traslazione del valore corrente sulla compoonente j-esima definita nell'i-esimo vettore del vicinato
-					row[j] = data[j] + canonicalNeighbourhood[i].data[j];
-				}
-				// inserisco nel vicinato
-				ret[i] = (row);
-			}
-			return ret;
-	}
-	
-/***Gradiente Generalizzato - direzione privilegiata*************************************************************************/
-
-	Vector generalizedGradient(std::function<double(Vector)> f) {
-		auto Y  = neighbourhood();
-		auto fY = Y.apply(f);
-		Vector ret(data.size());
-		double weightMean = 0.;
-		for(int i = 0 ; i < fY.size();i++)
-		{
-			double w = ( 1. + exp(10 * fY[i]) );
-			//double w = (1./pow(100000. ,3) + pow( fY[i]/100000. ,3)); // funzione di assegnazione dei pesi
-			weightMean = ( i * weightMean + w ) / ( i + 1 );
-			for(int j = 0 ; j < data.size();j++)
-			{
-				double to_add       =  fY[i] * w * (  Y[i].data[j] - data[j]  ); 
-				ret.data[j] 		= (ret.data[j] * i + to_add)/(i + 1.);
-			}
-		}
-		return ret * ( 1. / weightMean );
-		
-	}
-	
-/***Operatori****************************************************************************************************************/
-	
-	bool operator < (const Vector & other) const {
-		for(int i = 0 ; i < other.size();i++)
-		{
-			if(data[i] < other.data[i])
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	Vector operator * (double other)
-	{
-		Vector ret(data);
-		for(int j = 0 ; j < data.size();j++)
-			{
-				ret.data[j] *= other;
-			}
-		return ret;
-	}
-	
-	Vector & operator += (Vector & other) {
-		for(int j = 0 ; j < data.size();j++)
-			{
-				data[j] += other.data[j];
-			}
-		return *this;
-	}
-	
-	Vector & operator *= (double  other) {
-		for(int j = 0 ; j < data.size();j++)
-			{
-				data[j] *= other;
-			}
-		return *this;
-	}
-	
-	
-	operator std::vector<double>() {			// compatibilitá con l'oggetto wrapped
+	std::vector<double> & getData() {
 		return data;
 	}
 	
+/***Gestione neighbourhoods**************************************************************************************************/
+	private:
+	
+	static Neighbourhood<Vector> canonicalNeighbourhood;					// vicinato canonico
+	void buildCanonicalNeighbourhood (int n, double t);						// costruzione vicinato canonico
+	
+	public:
+	Neighbourhood<Vector> neighbourhood() const;									// ottenimento vicinato
+	
+/***Gradiente Generalizzato - direzione privilegiata*************************************************************************/
+	private:
+	// il gradiente generalizzato ha senso solo se esiste un contesto di ottimizzazione
+	// per garantire ció poniiamo il membro con disponibilitá di accesso privata.
+	// in questo modo potrá accedere esternamente solo la classe dichiarata FRIEND ovvero il template do optimizer
+	// associato al tipo della classe
+	Vector generalizedGradient(std::function<double(Vector)> f);			// gradiente generalizzato
+	
+/***Operatori****************************************************************************************************************/
+	public:
+	bool operator < (const Vector & other) const;
+	Vector operator * (double other);
+	Vector  operator + (Vector &  other);
+	Vector & operator += (Vector & other);
+	Vector & operator *= (double  other);
+	operator std::vector<double>();
+	double & operator [] (int i) {
+		return data[i];
+	} 
+	
 /***Metodi specializzati*****************************************************************************************************/	
-	
-	int size() const {
-		return data.size();
-	}
-	
-	
-	void show() {
-		std::cout << "->\t";
-		std::cout << std::setprecision(4) ;
-		for(int i = 0 ; i < size();i++)
-			std::cout << data[i] << std::setw(15);
-		std::cout << std::endl;
-	}
+	public:
+	int size() const;
+	void show();
 	
 	
 /***Contesto di ottimizzazione************************************************************************************************/
-
+	private:
 	Optimizer<Vector> * optimizationContext;							// contesto di ottimizzazione
+	Optimizer<Vector> * getOptimizationContext() const;
+	void setOptimizationContext(Optimizer<Vector> * other);
+	
 	
 /***Procedura di ottimizzazione***/
-
+private:
 static void improve(Vector & x , Vector & increment, Vector & mom) {
 			mom += increment;			
 			x += mom;					
 }
 
 /*** flatten ***/
-
+public:
 std::vector<double> flatten() {
 	return data;
 }
 
+/*** Enhancing function */
+static double defaultEnhancingFunction(double fy) {	// funzione iniettiva che descrive la velocitá di propagazione dell'informazione
+		return 1. + fy * fy;
+	}
+
+friend Optimizer<Vector>;
 };
 
-Neighbourhood<Vector> Vector::canonicalNeighbourhood;
+#endif

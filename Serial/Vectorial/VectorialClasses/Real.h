@@ -4,18 +4,20 @@
 *	Descr : Contiene l'oggetto Vector, un elemento della famiglia di classi Vectorial adatto per rappresentare vettori.
 */
 
-#pragma once
+#ifndef REAL_H
+#define REAL_H
+
 #include <iostream>
 #include <vector>
 
-
+#include "../../Optimizer/Optimizer/Optimizer.h"
 
 
 class Real {
 	public:
 /***Zero***********************************************************************************************************************/
 	
-	static Real zero(Real & x)  {
+	static Real zero(Real & x)  {	
 		return Real(0);
 	};
 	
@@ -30,91 +32,58 @@ class Real {
 
 /***gestione neighbourhoods**************************************************************************************************/
 
-	Neighbourhood<Real> canonicalNeighbourhood;					// vicinato canonico
-	void buildCanonicalNeighbourhood (int n,double t) {					// assemblaggio del vicinato canonico
-			std::default_random_engine generator;
-			std::normal_distribution<double> distribution(0.0,1.0);
-			for(int i = 0; i < n;i++)
-			{
-				const  Real & value = distribution(generator) * sqrt(t);
-				canonicalNeighbourhood.push_back(value);
-			}
-	}
-	
-	Neighbourhood<Real> neighbourhood() {				//	
-			int n = canonicalNeighbourhood.size();
-			std::vector<Real> ret(n);
-			for(int i = 0; i < n;i++)
-			{
-				double value = data + canonicalNeighbourhood[i];
-				ret[i] = value;
-			}
-			return ret;
-	}
+	static Neighbourhood<Real> canonicalNeighbourhood;					// vicinato canonico
+	void buildCanonicalNeighbourhood (int n,double t);
+	Neighbourhood<Real> neighbourhood() const;
 	
 /***Gradiente Generalizzato - direzione privilegiata*************************************************************************/
-
-	Real generalizedGradient(std::function<double(Real)> f) {
-		auto Y  = neighbourhood();
-		auto fY = Y.apply(f);
-		double ret = 0.;
-		double weightMean = 0.;
-		for(int i = 0 ; i < fY.size();i++)
-		{
-			double w 			= 1 + fY[i]*fY[i];
-			weightMean 			= ( i * weightMean + w ) / ( i + 1 );
-			double to_add      	=  fY[i] * w * (  Y[i] - data ); 
-			ret					= (ret * i + to_add)/(i + 1.);
-		}
-		return ret * ( 1. / weightMean );	
-	}
+	private:
+	// il gradiente generalizzato ha senso solo se esiste un contesto di ottimizzazione
+	// per garantire ció poniiamo il membro con disponibilitá di accesso privata.
+	// in questo modo potrá accedere esternamente solo la classe dichiarata FRIEND ovvero il template do optimizer
+	// associato al tipo della classe
+	
+	Real generalizedGradient(std::function<double(Real)> f);
 	
 /***Operatori****************************************************************************************************************/
-	bool operator < (const Real & other) const {
-		return data < other.data;
-	}
+	public:
 	
-	Real operator * (double other)
-	{
-		Real ret(data * other);
-		
-		return ret;
-	}
-	
-	Real & operator += (Real & other) {
-		data += other.data;
-		return *this;
-	}
-
-	Real & operator *= (double other) {
-		data *= other;
-		return *this;
-	}
-	
-	operator double() {								// compatibilitá con l'oggetto wrapped
-		return data;
-	}
+	bool operator < (const Real & other) const;
+	Real operator * (double other) const;
+	Real & operator += (Real & other);
+	Real & operator *= (double other);
+	operator double();
 	
 /***Metodi specializzati*****************************************************************************************************/	
 	
-
-	
-	
-	void show() {
-		std::cout << data << std::endl;
-	}
+	void show();
 	
 /***Contesto di ottimizzazione************************************************************************************************/
 
 	Optimizer<Real> * optimizationContext;							// contesto di ottimizzazione
 
 /*** Procedura di ottimizzazione ****/
-
+protected:		// accessibile solo dall'ottimizzatore!
 static void improve(Real & x , Real & increment, Real & mom) {
-			mom += increment;			
+			increment *= 0.001;
+			mom +=  increment;			
 			x += mom;					
 }
 
+public:
+/*** flatten ***/
+	const std::vector<double> flatten() {
+		std::vector<double> ret{data};
+		return ret;
+	};
+
+public:
+	static double defaultEnhancingFunction(double fy) {	// funzione iniettiva che descrive la velocitá di propagazione dell'informazione
+		return 1. + fy * fy;
+	}
+
+friend Optimizer<Real>;
 
 };
 
+#endif

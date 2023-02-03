@@ -7,6 +7,9 @@
 #include <string>
 #include <fstream>
 
+#ifndef CSV_H
+#define CSV_H
+
 class CSV
 {
 	public:
@@ -34,3 +37,5 @@ class CSV
 	
 	std::ofstream file;
 };
+
+#endif
