@@ -77,9 +77,8 @@ Moreover callbacks may have a special method "init", which is called when they a
 
 # Overview of the library - What is the computational cost? Improvement through parallelism
 
-In order to give the most possible freedom to the implementation of Vectorial classes, the Optimizer exploit little to non parallelism, in order to allow developers of vectorial classes to exploit all the threads that they need (moreover, we remember that gradient is in Vectorial classes, and gradient is the main ingredient!).
-In this version, the three default vectorial classes are parallelized using OPENMP. 
-The grade of parallelism is adjustable through the ```setThreads()``` method in the optimizer.
+Since computation of the gradient is the main bottleneck in the procedure, and unluckly the dependency between the steps of procedures does not allow to parallelize directly the generalizedGradient function , we tried to achieve a good level of parallelization mainly in the vectorial classes.
+All the tests allow to set the number of active threads, in order to observe their performance changes.
 
 
 
