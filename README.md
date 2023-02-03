@@ -72,6 +72,8 @@ A part from the properties of the optimizer itself (e.g. Precision and Time, whi
 CALLBACKS are simply functors with a call operator, which can be fed to the Optimizer with the ```.addCallback``` method before the launch of the Optimizer.
 In practice callbacks, offers the possibilty of passing every kind of class with a call operator to the Optimizer, giving the possibility not only to run function but also to expolit functions with a state during the optimization.
 Notable example of this is the ```simpleCallback``` : the method that show optimization basic data (value of the variable) is a callback, but also ```backwardInTime```, that reduce the time every a certain number of steps.
+Moreover callbacks may have a special method "init", which is called when they are saved in the optimizer. Is important to state that we used ```requires``` in order to make the definition of the method totally not mandatory, in order to improve flexibility in the development without introducing risks in the structure of the code.
+
 
 # Overview of the library - What is the computational cost? Improvement through parallelism
 
