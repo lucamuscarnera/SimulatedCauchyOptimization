@@ -8,6 +8,7 @@ Implementation of a stochastic simulation of heat diffusion on an unbounded doma
 
 Let $\mathcal f : \mathbb R \rightarrow \mathbb R^+$ a non-convex function. Suppose that we are interested in finding $x^\star$ , which is defined as $x^\star := argmax f$.
 Let's assume that f , not only is non-convex, but is also not differentiable. The proposed algorithms tries to build a framework for global optimization in pathological situations.
+Finally, we extend this whole framework to a discrete case where we try to model the heat diffusion on the ```Permutation Lattice``` and try to exploit the same way of reasoning to optimization problems on permutations.
 
 # Euristics behind the algorithm
 
