@@ -63,8 +63,21 @@ Generalized gradient , in this context, is a notion of weaker derivative describ
 Every space has , in the vectorial concept, a generalized gradient.
 While for Vector and Real , gradient was computed with the same approach of the computation of the solution ( I invite you to read some of the mathematical proofs in the AID folder) , in the Permutation class generalized gradient was implemented with a particular approach ; in fact it returns the GREEDY DIRECTION of improvement, but not in the original function, using instead the relaxed one.
 This difference of approach was not a problem semantically, thanks to our weaker notion of derivative.
+After the calculation of the gradient, the new solution is updated and so on until desired
 
+# Overview of the library - How can we customize the optimization?
 
+Non-Convex optimization is a difficult task. Especially, since this library approach the problem with a stochastic flavour it is often necessary to choose the correct set of HyperParamers.
+A part from the properties of the optimizer itself (e.g. Precision and Time, which describe respectively the precision of the approximation and the time passed in the simulated heat diffusion) , we can also exploit the idea of ```CALLBACKS``` to interact with the optimzire during the procedure.
+CALLBACKS are simply functors with a call operator, which can be fed to the Optimizer with the ```.addCallback``` method before the launch of the Optimizer.
+In practice callbacks, offers the possibilty of passing every kind of class with a call operator to the Optimizer, giving the possibility not only to run function but also to expolit functions with a state during the optimization.
+Notable example of this is the ```simpleCallback``` : the method that show optimization basic data (value of the variable) is a callback, but also ```backwardInTime```, that reduce the time every a certain number of steps.
+
+# Overview of the library - What is the computational cost? Improvement through parallelism
+
+In order to give the most possible freedom to the implementation of Vectorial classes, the Optimizer exploit little to non parallelism, in order to allow developers of vectorial classes to exploit all the threads that they need (moreover, we remember that gradient is in Vectorial classes, and gradient is the main ingredient!).
+In this version, the three default vectorial classes are parallelized using OPENMP. 
+The grade of parallelism is adjustable through the ```setThreads()``` method in the optimizer.
 
 
 
@@ -119,8 +132,3 @@ The visualization will show the so called "perceived function" : what does the v
 On the opposite we have a test without visualization. A non convex function similar to the one of the real test is optimized in five dimensions.
 
 
-
-
-
-
-Then, you will find the animation ```travel.gif``` in the folder ```Visualizer/Test1```
