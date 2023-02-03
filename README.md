@@ -41,6 +41,33 @@ Here we can see a comparision between the Classic Greedy algorithm VS Simulated 
 
 ![TravellingSalesman](https://github.com/lucamuscarnera/SimulatedCauchyOptimization/blob/main/travel.gif)
 
+# Overview of the library - What's the idea?
+
+The main idea of the library is to have a tool for optimizing objects. We try to find a common method for optimizing object in various space, with the notable example of permutations which do not have commutative sum.
+In particular, from a Developement point of view , the library implements Compile Time Polymorphism using ``` CONCEPTS ``` , a new C++ tool introduced in the last few years.
+In particular Concepts, allow the programmer to define polymorphism not in the sense of describing classes with hierarchy but instead describing a certain subset of the space of classes.
+Doing so , concepts allow a great freedom in the definition of polymorphism , allowing at the same time the correct functioning of the application.
+In fact, the idea behind the concepts is to allow compilation every time a certain class respects given conditions. Therefore , templates become powerful tools which enables a very generalist framework of programming.
+Moreover, as I said, concepts are evaluated in compile time , reducing even the minimal overhead which abstract classes may have caused.
+
+# Overview of the library - How we exploited the concept of Vectorial
+
+We defined the concept ```Vectorial``` , which we mathematically defineed - with an abuse of notation - as all the spaces which have a notion of ```neighbourhood```z and a ```sum``` operation (not necessarly commutative).This concepts directly translates in a subset of possible classes that can be fed to the ```Optimizer``` template class.
+Here is clear the role of the Vectorial concept : since Optimizer needs the operations that make a space a ```Vectorial```, then we let the template accept only elements in this family of classes.
+Moreover, a notable fact, the relaxing of a function is NOT DEPENDENT from the space of reference, so this was implemented in the Optimizer class.
+
+
+# Overview of the library - How does the optimization happens?
+After that we initialized the optimizer with the correct set of parameters, the optimizer calculate the generalized gradient.
+Generalized gradient , in this context, is a notion of weaker derivative described as "the direction that improves the most the optimization locally".
+Every space has , in the vectorial concept, a generalized gradient.
+While for Vector and Real , gradient was computed with the same approach of the computation of the solution ( I invite you to read some of the mathematical proofs in the AID folder) , in the Permutation class generalized gradient was implemented with a particular approach ; in fact it returns the GREEDY DIRECTION of improvement, but not in the original function, using instead the relaxed one.
+This difference of approach was not a problem semantically, thanks to our weaker notion of derivative.
+
+
+
+
+
 # Compilation of the library
 
 ```console
